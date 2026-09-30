@@ -1,0 +1,1471 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>SAMUEL WORK’S</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="sam.css?v=3">
+    <script src="https://unpkg.com/mammoth@1.8.0/mammoth.browser.min.js"></script>
+</head>
+<body>
+    <div id="lock" class="lock">
+        <section class="welcome-side">
+            <div class="welcome-brand"><span class="brand-mark">S</span><strong>SAMUEL WORK’S</strong><span>espace personnel</span></div>
+            <div class="welcome-copy">
+                <h1>La planification de ma journée,<br><em>en toute clarté.</em></h1>
+            </div>
+            <div class="welcome-orbit orbit-one"></div>
+            <div class="welcome-orbit orbit-two"></div>
+            <div class="welcome-footer"><span>LOCAL &amp; PRIVÉ</span><span>Version personnelle</span></div>
+        </section>
+
+        <section class="welcome-panel">
+            <div class="access-tabs"><span class="active">Se connecter</span></div>
+            <div class="login">
+                <h2 class="welcome-greeting">Bienvenue Samuel</h2>
+                <label for="pin">Code d’accès</label>
+                <input id="pin" class="input" type="password" placeholder="Votre code secret" autocomplete="off">
+                <button class="btn" onclick="unlock()">Ouvrir mon espace <span>→</span></button>
+                <p class="note">Vos données restent enregistrées localement sur cet ordinateur.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="app">
+        <aside class="side">
+            <div class="brand">SAMUEL <span>WORK’S</span></div>
+            <div class="nav">
+                <button onclick="show('dashboard',this)">01 · Journées</button>
+                <button onclick="show('projects',this)">02 · Objectifs du mois</button>
+                <button type="button" data-section="scripts">03 · Scripts</button>
+                <button type="button" data-section="books">04 · Bibliothèque</button>
+                <button type="button" data-section="personal">05 · Personnel</button>
+                <button onclick="show('finance',this)">06 · Finance</button>
+                <button onclick="show('needs',this)">07 · Besoins</button>
+                <button onclick="show('focus',this)">08 · Focus Minuteur</button>
+                <button onclick="show('analysis',this)">09 · Analyse</button>
+            </div>
+                <div style="position:absolute;bottom:20px;left:14px;right:14px"><button class="btn danger" style="width:100%;margin-bottom:8px"
+                    onclick="resetApp()">Réinitialiser</button><button class="btn dark" style="width:100%"
+                    onclick="lockApp()">Verrouiller</button></div>
+        </aside>
+        <main class="main">
+            <div id="dashboard" class="page">
+                <div class="top">
+                    <div>
+                        <div class="title">Préparation des journées</div>
+                        <div class="sub" id="todayLabel"></div>
+                    </div><button class="btn" onclick="openTaskComposer()">+ Tâche</button>
+                </div>
+                <div id="taskComposer" class="task-composer hidden">
+                    <select id="taskType" class="input">
+                        <option value="main">Tâche prioritaire</option>
+                        <option value="secondary">Tâche secondaire</option>
+                    </select>
+                    <input id="taskTitle" class="input" placeholder="Nom de la tâche" autocomplete="off">
+                    <button class="btn" onclick="addToday()">Ajouter</button>
+                    <button class="btn dark" onclick="closeTaskComposer()">Annuler</button>
+                </div>
+                <div class="grid">
+                    <div class="card">
+                        <div class="between">
+                            <h3>Les 3 tâches principales</h3><span class="pill main">Priorité ×3</span>
+                        </div>
+                        <div id="mainTasks"></div>
+                    </div>
+                    <div class="card">
+                        <div class="between">
+                            <h3>2 tâches secondaires</h3><span class="pill">Secondaires ×2</span>
+                        </div>
+                        <div id="secondaryTasks"></div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="between">
+                        <h3>Calendrier</h3><input id="month" type="month" class="input" style="width:170px"
+                            onchange="renderCalendar()">
+                    </div>
+                    <div class="calendar" id="calendar"></div>
+                </div>
+                <div class="card">
+                    <div class="between">
+                        <div>
+                            <h3>Bilan de la semaine</h3>
+                            <div class="sub" id="weekLabel"></div>
+                        </div><strong id="score" style="font-size:32px;color:#0a967a">0/100</strong>
+                    </div>
+                    <div class="week-controls">
+                        <button class="btn dark" onclick="changeWeek(-1)">← Semaine précédente</button>
+                        <button class="btn" onclick="showCurrentWeek()">Cette semaine</button>
+                        <button class="btn dark" onclick="changeWeek(1)">Semaine suivante →</button>
+                    </div>
+                    <div class="bar"><i id="scorebar" style="width:0%"></i></div>
+                    <div class="chart" id="chart"></div>
+                </div>
+            </div>
+
+            <div id="projects" class="page hidden">
+                <div class="top">
+                    <div>
+                        <div class="title">Objectifs du mois</div>
+                        <div class="sub">Ajoute tes 3 objectifs principaux et coche-les quand ils sont terminés.</div>
+                    </div>
+                    <label class="month-picker">Mois
+                        <input id="projectMonth" type="month" class="input" onchange="renderProjects()">
+                    </label><button class="btn" onclick="openProjectComposer()">+ Ajouter un objectif</button>
+                </div>
+                <div id="projectComposer" class="project-composer hidden">
+                    <input id="projectName" class="input" placeholder="Écris ton objectif du mois" autocomplete="off">
+                    <textarea id="projectDescription" class="input" placeholder="Détails ou étapes de l’objectif"></textarea>
+                    <button class="btn" onclick="addProject()">Ajouter l’objectif</button>
+                    <button class="btn dark" onclick="closeProjectComposer()">Annuler</button>
+                </div>
+                <div class="grid3" id="projectsList"></div>
+                <div class="card objective-performance">
+                    <div>
+                        <h3>Performance du mois</h3>
+                        <p class="sub">Objectifs cochés sur 3 pour le mois sélectionné.</p>
+                    </div>
+                    <div id="projectPerformance" class="project-performance-chart"></div>
+                </div>
+            </div>
+
+            <div id="scripts" class="page hidden">
+                <div class="top">
+                    <div>
+                        <div class="title">Studio de scripts</div>
+                        <div class="sub">Structure prête à remplir.</div>
+                    </div><button class="btn" onclick="newScript()">+ Nouveau script</button>
+                </div>
+                <div id="scriptComposer" class="script-composer hidden">
+                    <input id="newScriptTitle" class="input" placeholder="Titre du script" autocomplete="off">
+                    <select id="newScriptType" class="input">
+                        <option value="short">Script court</option>
+                        <option value="long">Script long</option>
+                    </select>
+                        <select id="newScriptCategory" class="input">
+                            <option value="Général">Général</option>
+                            <option value="Travail">Travail</option>
+                            <option value="Personnel">Personnel</option>
+                            <option value="Contenu">Contenu</option>
+                            <option value="Autre">Autre</option>
+                        </select>
+                    <textarea id="newScriptContent" placeholder="Écris le contenu ou les idées de ton script"></textarea>
+                        <button class="btn" onclick="addScript()">Sauvegarder</button>
+                    <button class="btn dark" onclick="closeScriptComposer()">Annuler</button>
+                    <p id="scriptMessage" class="script-message" role="status"></p>
+                </div>
+                <div class="grid">
+                    <div class="card">
+                        <h3>Mes scripts</h3>
+                        <div id="scriptList"></div>
+                    </div>
+                    <div class="card" id="editor">
+                        <p class="sub">Sélectionne ou crée un script.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="books" class="page hidden">
+                <div class="top">
+                    <div>
+                        <div class="title">Bibliothèque</div>
+                        <div class="sub">Classe tes livres par domaine.</div>
+                    </div><button class="btn" onclick="openBookComposer()">+ Livre</button>
+                </div>
+                <div id="bookComposer" class="book-composer hidden">
+                    <input id="bookTitle" class="input" placeholder="Nom du livre" autocomplete="off">
+                    <input id="bookAuthor" class="input" placeholder="Auteur" autocomplete="off">
+                    <select id="bookCategory" class="input">
+                        <option>Argent</option>
+                        <option>Art oratoire</option>
+                        <option>Leadership</option>
+                        <option>Émotions</option>
+                        <option>Pensées</option>
+                    </select>
+                    <label class="file-picker">Choisir le fichier
+                        <input id="bookFile" type="file" accept=".pdf,.epub,.txt,.doc,.docx">
+                    </label>
+                    <label class="book-read-picker"><input id="bookRead" type="checkbox" checked> Livre déjà lu</label>
+                    <button class="btn" onclick="addBook()">Ajouter le livre</button>
+                    <button class="btn dark" onclick="closeBookComposer()">Annuler</button>
+                </div>
+                <div class="card book-chart-card">
+                    <div>
+                        <h3>Répartition de mes livres lus</h3>
+                        <p class="sub">Par domaine / caractère de lecture.</p>
+                    </div>
+                    <div id="bookChart" class="book-chart"></div>
+                </div>
+                <div class="grid3" id="booksList"></div>
+            </div>
+
+            <div id="bookReader" class="book-reader hidden">
+                <div class="book-reader-panel">
+                    <div class="between">
+                        <div>
+                            <h2 id="readerTitle">Lecture du livre</h2>
+                            <div class="sub" id="readerFileName"></div>
+                        </div>
+                        <div class="reader-actions">
+                            <div class="reader-timer"><span id="readerTimer">00:00:00</span><small>temps de lecture</small></div>
+                            <button id="readerTimerToggle" class="btn" onclick="toggleReadingTimer()">Pause</button>
+                            <button class="btn dark" onclick="resetReadingTimer()">Réinitialiser</button>
+                            <button class="btn dark" onclick="closeBookReader()">Fermer</button>
+                        </div>
+                    </div>
+                    <iframe id="readerFrame" title="Lecteur de livre"></iframe>
+                </div>
+            </div>
+
+            <div id="personal" class="page hidden">
+                <div class="title">Personnel</div>
+                <div class="sub">Suivi mensuel de tes données personnelles.</div>
+                <div class="card" style="margin-top:18px">
+                    <div class="grid3"><label>Poids actuel (kg)<input id="weight" class="input" type="number" step=".1"
+                                ></label><label>Taille (cm)<input id="height" class="input"
+                                type="number"></label><label>Mois<select id="personalMonth" class="input" onchange="loadPersonalMonth()">
+                                <option>Janvier</option>
+                                <option>Février</option>
+                                <option>Mars</option>
+                                <option>Avril</option>
+                                <option>Mai</option>
+                                <option>Juin</option>
+                                <option>Juillet</option>
+                                <option>Août</option>
+                                <option>Septembre</option>
+                                <option>Octobre</option>
+                                <option>Novembre</option>
+                                <option>Décembre</option>
+                            </select></label></div>
+                    <button id="personalSubmit" class="btn personal-add" onclick="addPersonalRecord()">Ajouter ces données</button>
+                </div>
+                <div class="card">
+                    <h3>Historique personnel</h3>
+                    <div id="personalHistory"></div>
+                </div>
+                <div class="card">
+                    <div class="between">
+                        <div>
+                            <h3>Diagramme mensuel</h3>
+                            <div class="sub">Répartition de ton poids enregistré par mois.</div>
+                        </div>
+                    </div>
+                    <div id="personalChart" class="personal-chart"></div>
+                </div>
+            </div>
+
+            <div id="finance" class="page hidden">
+                <div class="top">
+                    <div>
+                        <div class="title">Finance</div>
+                        <div class="sub">Épargne, investissements et objectifs.</div>
+                    </div><button class="btn" onclick="openFinanceComposer()">+ Entrée</button>
+                </div>
+                <div id="financeComposer" class="finance-composer hidden">
+                    <select id="financeType" class="input">
+                        <option value="épargne">Épargne</option>
+                        <option value="investissement">Investissement</option>
+                    </select>
+                    <input id="financeAmount" class="input" type="number" min="0.01" step="0.01" placeholder="Montant">
+                    <input id="financeProject" class="input" placeholder="Objectif ou description">
+                    <input id="financeDate" class="input" type="date">
+                    <button id="financeSubmit" class="btn" onclick="addFinance()">Enregistrer</button>
+                    <button class="btn dark" onclick="closeFinanceComposer()">Annuler</button>
+                </div>
+                <div class="grid3 metric-grid finance-metrics">
+                    <div class="stat metric-card metric-saving">
+                        <span class="metric-label">Épargne totale</span>
+                        <b id="savingTotal">0</b>
+                        <small>Montant mis de côté</small>
+                    </div>
+                    <div class="stat metric-card metric-invest">
+                        <span class="metric-label">Investissements</span>
+                        <b id="investTotal">0</b>
+                        <small>Capital investi</small>
+                    </div>
+                    <div class="stat metric-card metric-net">
+                        <span class="metric-label">Patrimoine suivi</span>
+                        <b id="netTotal">0</b>
+                        <small>Épargne + investissements</small>
+                    </div>
+                </div>
+                <div class="card" style="margin-top:18px">
+                    <div id="financeList"></div>
+                    <div class="finance-chart" id="financeChart"></div>
+                </div>
+            </div>
+
+            <div id="needs" class="page hidden">
+                <div class="top">
+                    <div>
+                        <div class="title">Besoins à acheter</div>
+                        <div class="sub">Classe tes achats par priorité de prix.</div>
+                    </div><button class="btn" onclick="openNeedComposer()">+ Besoin</button>
+                </div>
+                <div id="needComposer" class="need-composer hidden">
+                    <select id="needLevel" class="input">
+                        <option value="cheap">Moins cher</option>
+                        <option value="medium">Moyen</option>
+                        <option value="expensive">Plus cher</option>
+                    </select>
+                    <input id="needName" class="input" placeholder="Nom du besoin" autocomplete="off">
+                    <button id="needSubmit" class="btn" onclick="addNeed()">Ajouter</button>
+                    <button class="btn dark" onclick="closeNeedComposer()">Annuler</button>
+                </div>
+                <div class="grid3 metric-grid need-metrics">
+                    <div class="card need-card need-cheap">
+                        <div class="need-card-head"><h3>Moins cher</h3></div>
+                        <p>Achats à petit prix</p>
+                        <div id="cheap"></div>
+                    </div>
+                    <div class="card need-card need-medium">
+                        <div class="need-card-head"><h3>Moyen</h3></div>
+                        <p>Budget intermédiaire</p>
+                        <div id="medium"></div>
+                    </div>
+                    <div class="card need-card need-expensive">
+                        <div class="need-card-head"><h3>Plus cher</h3></div>
+                        <p>Achats importants</p>
+                        <div id="expensive"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="focus" class="page hidden">
+                <div class="top">
+                    <div>
+                        <div class="title">Focus Minuteur</div>
+                        <div class="sub">Une session simple pour rester concentré.</div>
+                    </div>
+                </div>
+                <div class="focus-layout">
+                    <section class="card focus-timer-card">
+                        <div class="focus-eyebrow">FOCUS</div>
+                        <div class="focus-ring" aria-live="polite">
+                            <div class="focus-ring-inner">
+                                <div id="focusTimer" class="focus-timer">00:30:00</div>
+                                <div id="focusStatus" class="focus-status">Prêt à commencer</div>
+                            </div>
+                        </div>
+                        <div id="focusMonitorLabel" class="focus-monitor-label">CONCENTRATION EN COURS</div>
+                        <div class="focus-controls">
+                            <button id="focusPause" class="btn" onclick="toggleFocusPause()" disabled>Pause</button>
+                            <button class="btn dark" onclick="stopFocus()" disabled id="focusStop">Arrêter</button>
+                        </div>
+                        <button id="focusAlarmStop" class="btn danger focus-alarm-stop hidden" onclick="stopFocusAlert()">ARRÊTER LA SONNERIE</button>
+                        <div id="focusMessage" class="focus-message" role="status"></div>
+                    </section>
+                    <section class="card focus-settings-card">
+                        <div class="between">
+                            <div>
+                                <h3>Durée de la session</h3>
+                                <p class="sub">Définis la durée de ta session.</p>
+                            </div>
+                        </div>
+                        <label id="customFocusField" class="focus-custom">Durée en minutes
+                            <input id="customFocusMinutes" class="input" type="number" min="1" max="1440" step="1" placeholder="Ex. 25" value="30">
+                        </label>
+                        <label class="focus-custom focus-sequence-field">Séquence facultative
+                            <input id="focusSequence" class="input" type="text" inputmode="decimal" placeholder="Ex. 25, 5, 25">
+                            <small>Durées en minutes, séparées par des virgules.</small>
+                        </label>
+                        <button id="focusStart" class="btn focus-start" onclick="startFocus()">COMMENCER LE FOCUS</button>
+                    </section>
+                </div>
+            </div>
+
+            <div id="analysis" class="page hidden">
+                <div class="top analysis-top">
+                    <div>
+                        <div class="title">Analyse</div>
+                        <div class="sub">Ton coach personnel, basé uniquement sur tes données enregistrées.</div>
+                    </div>
+                    <select id="analysisPeriod" class="input analysis-period" onchange="renderAnalysis()" aria-label="Période d’analyse">
+                        <option value="day">Aujourd’hui</option>
+                        <option value="week">Cette semaine</option>
+                        <option value="month">Ce mois</option>
+                    </select>
+                </div>
+                <section class="analysis-stats" id="analysisStats"></section>
+                <div class="analysis-layout">
+                    <section class="card analysis-coach-card">
+                        <div class="analysis-card-heading"><span class="analysis-icon">AI</span><div><h3>Analyse du jour</h3><p class="sub">Une lecture honnête de ta progression.</p></div></div>
+                        <div id="analysisCoach" class="analysis-coach"></div>
+                    </section>
+                    <section class="card analysis-priority-card">
+                        <h3>Ce que tu dois améliorer</h3>
+                        <p class="sub">Des actions concrètes issues de tes données.</p>
+                        <div id="analysisPriorities" class="analysis-priorities"></div>
+                    </section>
+                </div>
+                <section class="card analysis-charts-card">
+                    <div class="between"><div><h3>Évolution dans le temps</h3><p class="sub">Les courbes se mettent à jour avec tes activités datées.</p></div><span id="analysisComparison" class="pill"></span></div>
+                    <div id="analysisCharts" class="analysis-charts"></div>
+                </section>
+            </div>
+        </main>
+    </div>
+    <script>
+        const KEY = 'samuel_works_v1', DB_VERSION = 2, CODE = 'Sam30558';
+        const FILE_DB_NAME = 'samuel_works_files', FILE_DB_VERSION = 1;
+        const EMPTY_DATA = { days: {}, projects: [], scripts: [], books: [], finance: [], needs: [], personal: {}, focusSessions: [] };
+        let saveTimer;
+        let D = loadDatabase();
+        let selectedDay = dayKey();
+        let weekOffset = 0;
+        let needEditIndex = -1;
+        let readingTimer = null;
+        let readingBookIndex = -1;
+        let readingStartedAt = 0;
+        let readingElapsed = 0;
+        let storageWarningShown = false;
+        let fileDatabasePromise;
+        let activeBookObjectUrl = '';
+        let focusTimerId = null;
+        let focusSelectedMinutes = 30;
+        let focusSession = null;
+        let focusQueue = [];
+        let focusAudioContext = null;
+        let focusAlertTimer = null;
+        let focusAlertNodes = [];
+
+        function openFileDatabase() {
+            if (fileDatabasePromise) return fileDatabasePromise;
+            fileDatabasePromise = new Promise((resolve, reject) => {
+                let request = indexedDB.open(FILE_DB_NAME, FILE_DB_VERSION);
+                request.onupgradeneeded = () => request.result.createObjectStore('bookFiles');
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+            return fileDatabasePromise;
+        }
+
+        function storeBookFile(fileId, file) {
+            return openFileDatabase().then(database => new Promise((resolve, reject) => {
+                let transaction = database.transaction('bookFiles', 'readwrite');
+                transaction.objectStore('bookFiles').put(file, fileId);
+                transaction.oncomplete = resolve;
+                transaction.onerror = () => reject(transaction.error);
+            }));
+        }
+
+        function getBookFile(fileId) {
+            return openFileDatabase().then(database => new Promise((resolve, reject) => {
+                let request = database.transaction('bookFiles').objectStore('bookFiles').get(fileId);
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            }));
+        }
+
+        function removeBookFile(fileId) {
+            if (!fileId) return Promise.resolve();
+            return openFileDatabase().then(database => new Promise((resolve, reject) => {
+                let transaction = database.transaction('bookFiles', 'readwrite');
+                transaction.objectStore('bookFiles').delete(fileId);
+                transaction.oncomplete = resolve;
+                transaction.onerror = () => reject(transaction.error);
+            }));
+        }
+
+        function clearBookFiles() {
+            return openFileDatabase().then(database => new Promise((resolve, reject) => {
+                let transaction = database.transaction('bookFiles', 'readwrite');
+                transaction.objectStore('bookFiles').clear();
+                transaction.oncomplete = resolve;
+                transaction.onerror = () => reject(transaction.error);
+            }));
+        }
+
+        function newFileId() {
+            return `book-${crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`}`;
+        }
+
+        async function migrateBookFiles() {
+            let booksChanged = false;
+            for (let book of D.books) {
+                if (!book.fileData || book.fileId) continue;
+                let fileId = newFileId();
+                try {
+                    let response = await fetch(book.fileData);
+                    await storeBookFile(fileId, await response.blob());
+                    book.fileId = fileId;
+                    delete book.fileData;
+                    booksChanged = true;
+                } catch (error) {
+                    console.error('Migration du fichier impossible', error);
+                }
+            }
+            if (booksChanged) save();
+        }
+
+        function normalizeDatabase(data) {
+            let normalized = { ...EMPTY_DATA, ...(data && typeof data === 'object' ? data : {}) };
+            ['projects', 'scripts', 'books', 'finance', 'needs'].forEach(key => {
+                if (!Array.isArray(normalized[key])) normalized[key] = [];
+            });
+            if (!Array.isArray(normalized.focusSessions)) normalized.focusSessions = [];
+            if (!normalized.days || typeof normalized.days !== 'object' || Array.isArray(normalized.days)) normalized.days = {};
+            if (!normalized.personal || typeof normalized.personal !== 'object' || Array.isArray(normalized.personal)) normalized.personal = {};
+            if (!Array.isArray(normalized.personal.history)) normalized.personal.history = [];
+            return normalized;
+        }
+
+        function loadDatabase() {
+            try {
+                let stored = JSON.parse(localStorage.getItem(KEY) || 'null');
+                if (stored?.data && stored.version) {
+                    let data = { ...EMPTY_DATA, ...stored.data };
+                    return normalizeDatabase(stored.version < DB_VERSION ? { ...data, days: {} } : data);
+                }
+                if (stored?.days) return normalizeDatabase({ ...EMPTY_DATA, ...stored, days: {} });
+                return normalizeDatabase(stored || EMPTY_DATA);
+            } catch (error) {
+                return normalizeDatabase(EMPTY_DATA);
+            }
+        }
+
+        function save() {
+            try {
+                localStorage.setItem(KEY, JSON.stringify({ version: DB_VERSION, updatedAt: new Date().toISOString(), data: D }));
+                if (document.getElementById('analysis') && !document.getElementById('analysis').classList.contains('hidden')) renderAnalysis();
+                return true;
+            } catch (error) {
+                if (!storageWarningShown) {
+                    storageWarningShown = true;
+                    alert('Impossible d’enregistrer les données localement. Le stockage du navigateur est plein.');
+                }
+                console.error('Erreur de stockage local', error);
+                return false;
+            }
+        }
+
+        function queueSave() {
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(save, 300);
+        }
+        function unlock() { if (document.getElementById('pin').value === CODE) { sessionStorage.ok = '1'; document.getElementById('lock').style.display = 'none'; init(); requestTaskReminderPermission() } else alert('Code incorrect.') }
+        function lockApp() { sessionStorage.removeItem('ok'); location.reload() }
+        function resetApp() {
+            if (!confirm('Cette action supprimera toutes vos tÃ¢ches, projets, livres, finances, besoins et donnÃ©es personnelles. Continuer ?')) return;
+            clearTimeout(saveTimer);
+            D = JSON.parse(JSON.stringify(EMPTY_DATA));
+            selectedDay = dayKey();
+            weekOffset = 0;
+            localStorage.removeItem(KEY);
+            clearBookFiles().catch(error => console.error('Nettoyage des fichiers impossible', error));
+            save();
+            location.reload();
+        }
+        let taskReminderTimer;
+        function requestTaskReminderPermission() {
+            if (!('Notification' in window) || Notification.permission !== 'default') return;
+            Notification.requestPermission().then(permission => {
+                if (permission === 'granted') startTaskReminders();
+                else if (permission === 'denied') alert('Les rappels automatiques sont désactivés dans les permissions du navigateur.');
+            });
+        }
+        function startTaskReminders() {
+            if (!('Notification' in window) || Notification.permission !== 'granted') return;
+            clearTimeout(taskReminderTimer);
+            let now = new Date();
+            let next = [8, 22].map(hour => { let time = new Date(now); time.setHours(hour, 0, 0, 0); if (time <= now) time.setDate(time.getDate() + 1); return time }).sort((a, b) => a - b)[0];
+            taskReminderTimer = setTimeout(() => { sendTaskReminder(); startTaskReminders() }, next - now);
+        }
+        function sendTaskReminder() {
+            new Notification("SAMUEL WORK'S", { body: 'C’est le moment de compléter tes dossiers et ton application.' });
+        }
+        async function init() { if (sessionStorage.ok !== '1') return; document.getElementById('lock').style.display = 'none'; let now = new Date(); selectedDay = dayKey(now); document.getElementById('month').value = monthKey(now); setupProjectMonths(); await migrateBookFiles(); loadPersonal(); renderAll(); startTaskReminders(); save() }
+        function dayKey(d = new Date()) { let year = d.getFullYear(), month = String(d.getMonth() + 1).padStart(2, '0'), day = String(d.getDate()).padStart(2, '0'); return `${year}-${month}-${day}` }
+        function monthKey(d = new Date()) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}` }
+        function getDay(k = selectedDay) { if (!D.days[k]) D.days[k] = { main: ['', '', ''], secondary: ['', ''], done: [false, false, false, false, false] }; return D.days[k] }
+        function taskRow(text, i, main) {
+            return `<div class="task ${getDay().done[i] ? 'done' : ''}"><input type="checkbox" ${getDay().done[i] ? 'checked' : ''} onchange="toggleTask(${i})"><input class="input tasktext" value="${esc(text)}" placeholder="${main ? 'Tâche principale ' + (i + 1) : 'Tâche secondaire ' + (i - 2)}" onchange="setTask(${i},this.value)"></div>`;
+        }
+        function renderToday() { let x = getDay(); document.getElementById('todayLabel').textContent = new Date(`${selectedDay}T12:00`).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }); document.getElementById('mainTasks').innerHTML = x.main.map((t, i) => taskRow(t, i, true)).join(''); document.getElementById('secondaryTasks').innerHTML = x.secondary.map((t, i) => taskRow(t, i + 3, false)).join('') }
+        function setTask(i, v) { let x = getDay(); if (i < 3) x.main[i] = v; else x.secondary[i - 3] = v; save(); renderCalendar(); renderScore() }
+        function toggleTask(i) { getDay().done[i] = !getDay().done[i]; save(); renderToday(); renderCalendar(); renderScore() }
+        function openTaskComposer() {
+            document.getElementById('taskComposer').classList.remove('hidden');
+            document.getElementById('taskTitle').focus();
+        }
+
+        function closeTaskComposer() {
+            document.getElementById('taskComposer').classList.add('hidden');
+            document.getElementById('taskTitle').value = '';
+        }
+
+        function addToday() {
+            let x = getDay();
+            let type = document.getElementById('taskType').value;
+            let title = document.getElementById('taskTitle').value.trim();
+            if (!title) return alert('Écris le nom de la tâche.');
+
+            if (type === 'main') {
+                let index = x.main.findIndex(task => !task);
+                if (index < 0) return alert('Les 3 tâches prioritaires sont déjà remplies.');
+                x.main[index] = title;
+            } else {
+                let index = x.secondary.findIndex(task => !task);
+                if (index < 0) return alert('Les 2 tâches secondaires sont déjà remplies.');
+                x.secondary[index] = title;
+            }
+
+            save();
+            renderToday();
+            closeTaskComposer();
+        }
+        function renderCalendar() { let el = document.getElementById('calendar'), v = document.getElementById('month').value; let [y, m] = v.split('-').map(Number), first = new Date(y, m - 1, 1), last = new Date(y, m, 0), start = (first.getDay() + 6) % 7; let out = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'].map(x => `<div class="dayname">${x}</div>`).join(''); for (let i = 0; i < start; i++)out += '<div></div>'; for (let n = 1; n <= last.getDate(); n++) { let d = new Date(y, m - 1, n), k = dayKey(d), x = D.days[k], done = x ? x.done.filter(Boolean).length : 0; out += `<div class="day ${k === dayKey() ? 'today' : ''} ${k === selectedDay ? 'selected' : ''}" onclick="openDate('${k}')"><div class="daynum">${n}</div>${done ? '<span class="dot"></span>' + done + '/5' : ''}</div>` } el.innerHTML = out }
+        function openDate(k) { selectedDay = k; renderToday(); renderCalendar(); closeTaskComposer() }
+        function startOfWeek(date = new Date()) { let monday = new Date(date); let day = monday.getDay(); monday.setDate(monday.getDate() - (day === 0 ? 6 : day - 1)); monday.setHours(12, 0, 0, 0); return monday }
+        function changeWeek(amount) { weekOffset += amount; renderScore() }
+        function showCurrentWeek() { weekOffset = 0; renderScore() }
+        function renderScore() { let mon = startOfWeek(); mon.setDate(mon.getDate() + weekOffset * 7); let sun = new Date(mon); sun.setDate(mon.getDate() + 6); document.getElementById('weekLabel').textContent = `Semaine du ${mon.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })} au ${sun.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}`; let total = 0, max = 0, vals = []; for (let i = 0; i < 7; i++) { let d = new Date(mon); d.setDate(mon.getDate() + i); let x = D.days[dayKey(d)]; let s = x ? (x.done[0] ? 2 : 0) + (x.done[1] ? 2 : 0) + (x.done[2] ? 2 : 0) + (x.done[3] ? 1 : 0) + (x.done[4] ? 1 : 0) : 0; total += s; max += 8; vals.push(s) } let pct = Math.round(total / max * 100); document.getElementById('score').textContent = pct + '/100'; document.getElementById('scorebar').style.width = pct + '%'; document.getElementById('chart').innerHTML = vals.map((v, i) => `<div class="barcol"><i style="height:${Math.max(3, v / 8 * 130)}px"></i><small>${['L', 'M', 'M', 'J', 'V', 'S', 'D'][i]}</small></div>`).join('') }
+        function setupProjectMonths() {
+            let select = document.getElementById('projectMonth');
+            if (select && !select.value) select.value = monthKey();
+        }
+        function selectedProjectMonth() { return document.getElementById('projectMonth').value || monthKey() }
+        function openProjectComposer() {
+            let month = selectedProjectMonth();
+            if (D.projects.filter(project => project.month === month).length >= 3) return alert('Les 3 objectifs de ce mois sont déjà remplis.');
+            document.getElementById('projectComposer').classList.remove('hidden');
+            document.getElementById('projectName').focus();
+        }
+        function closeProjectComposer() {
+            document.getElementById('projectComposer').classList.add('hidden');
+            document.getElementById('projectName').value = '';
+            document.getElementById('projectDescription').value = '';
+        }
+        function addProject() {
+            let month = selectedProjectMonth();
+            let name = document.getElementById('projectName').value.trim();
+            let desc = document.getElementById('projectDescription').value.trim();
+            if (!name) return alert('Écris ton objectif du mois.');
+            if (D.projects.filter(project => project.month === month).length >= 3) return alert('Les 3 objectifs de ce mois sont déjà remplis.');
+            D.projects.push({ name, desc, done: false, month });
+            save();
+            renderProjects();
+            closeProjectComposer();
+        }
+        function renderProjects() { let month = selectedProjectMonth(), projects = D.projects.map((p, index) => ({ p, index })).filter(({ p }) => p.month === month); document.getElementById('projectsList').innerHTML = [0, 1, 2].map(order => { let item = projects[order]; if (!item) return `<div class="card objective-empty"><span class="pill">Objectif ${order + 1}</span><p class="sub">Emplacement disponible</p><button class="btn" onclick="openProjectComposer()">Ajouter cet objectif</button></div>`; let { p, index } = item; return `<div class="card"><div class="between"><span class="pill">Objectif ${order + 1}</span><input type="checkbox" ${p.done ? 'checked' : ''} onchange="D.projects[${index}].done=this.checked;save();renderProjects()"></div><br><input class="input" value="${esc(p.name)}" placeholder="Écris ton objectif du mois" onchange="D.projects[${index}].name=this.value;save()"><br><br><textarea placeholder="Détails, étapes, date prévue..." onchange="D.projects[${index}].desc=this.value;save()">${esc(p.desc)}</textarea></div>` }).join(''); renderProjectPerformance(projects) }
+        function renderProjectPerformance(projects) { let completed = projects.filter(({ p }) => p.done).length, percentage = Math.round(completed / 3 * 100), chart = document.getElementById('projectPerformance'); chart.style.setProperty('--performance', `${percentage}%`); chart.innerHTML = `<div class="performance-donut"><div><b>${completed}/3</b><small>${percentage}%</small></div></div><div class="performance-label"><strong>${completed} objectif${completed > 1 ? 's' : ''} terminé${completed > 1 ? 's' : ''}</strong><span>${selectedProjectMonth()}</span></div>` }
+        function newScript() {
+            document.getElementById('scriptComposer').classList.remove('hidden');
+            document.getElementById('scriptMessage').textContent = '';
+            document.getElementById('newScriptTitle').focus();
+        }
+        function closeScriptComposer() {
+            document.getElementById('scriptComposer').classList.add('hidden');
+            document.getElementById('newScriptTitle').value = '';
+            document.getElementById('newScriptType').value = 'short';
+            document.getElementById('newScriptCategory').value = 'Général';
+            document.getElementById('newScriptContent').value = '';
+            document.getElementById('scriptMessage').textContent = '';
+        }
+        function setScriptMessage(message, error = false) {
+            let messageElement = document.getElementById('scriptMessage');
+            messageElement.textContent = message;
+            messageElement.classList.toggle('error', error);
+        }
+        function addScript() {
+            let title = document.getElementById('newScriptTitle').value.trim();
+            let type = document.getElementById('newScriptType').value;
+            let category = document.getElementById('newScriptCategory').value;
+            let content = document.getElementById('newScriptContent').value.trim();
+            if (!title) return setScriptMessage('Écris le titre du script.', true);
+            if (!content) return setScriptMessage('Écris le contenu du script.', true);
+            let script = { title, type, category, hook: '', intro: '', dev: content, cta: '', createdAt: new Date().toISOString() };
+            D.scripts.push(script);
+            try {
+                save();
+            } catch (error) {
+                D.scripts.pop();
+                setScriptMessage('Impossible d’enregistrer le script. Vérifie l’espace disponible puis réessaie.', true);
+                return;
+            }
+            renderScripts();
+            let index = D.scripts.length - 1;
+            closeScriptComposer();
+            editScript(index);
+        }
+        function deleteScript(i) {
+            if (!Array.isArray(D.scripts) || !Number.isInteger(i) || i < 0 || i >= D.scripts.length) return;
+            let script = D.scripts[i];
+            if (!confirm(`Voulez-vous vraiment supprimer « ${script.title || 'ce script'} » ?`)) return;
+            let removed = D.scripts.splice(i, 1)[0];
+            if (!save()) {
+                D.scripts.splice(i, 0, removed);
+                return;
+            }
+            renderScripts();
+            if (D.scripts.length) editScript(Math.min(i, D.scripts.length - 1));
+            else document.getElementById('editor').innerHTML = '<p class="sub">Aucun script. Clique sur « + Nouveau script » pour commencer.</p>';
+        }
+        function renderScripts() {
+            if (!Array.isArray(D.scripts)) D.scripts = [];
+            D.scripts = D.scripts.filter(script => script && typeof script === 'object');
+            let list = document.getElementById('scriptList');
+            if (!list) return;
+            list.innerHTML = D.scripts.length ? D.scripts.map((s, i) => { let preview = s.dev || s.hook || s.intro || ''; let date = s.createdAt ? new Date(s.createdAt).toLocaleDateString('fr-FR') : ''; return `<div class="script-row"><button class="btn dark" onclick="editScript(${i})"><strong>${esc(s.title || 'Script sans titre')}</strong><small>${esc(s.type || 'short')} · ${esc(s.category || 'Général')}${date ? ` · ${date}` : ''}</small>${preview ? `<span>${esc(preview.slice(0, 90))}${preview.length > 90 ? '…' : ''}</span>` : ''}</button><button class="btn script-delete" onclick="deleteScript(${i})">Supprimer</button></div>` }).join('') : '<p class="sub">Aucun script. Clique sur « + Nouveau script » pour commencer.</p>';
+        }
+        function editScript(i) {
+            if (!Array.isArray(D.scripts) || !Number.isInteger(i) || i < 0 || i >= D.scripts.length) {
+                let editor = document.getElementById('editor');
+                if (editor) editor.innerHTML = '<p class="sub">Ce script n’existe plus.</p>';
+                return;
+            }
+            let s = D.scripts[i] || {};
+            let fields = [['dev', 'SCRIPT']];
+            let editor = document.getElementById('editor');
+            if (!editor) return;
+            editor.innerHTML = `<div class="row"><input class="input" value="${esc(s.title)}" onchange="D.scripts[${i}].title=this.value;save();renderScripts()"><select class="input" onchange="D.scripts[${i}].type=this.value;save();editScript(${i})"><option ${s.type === 'short' ? 'selected' : ''}>short</option><option ${s.type === 'long' ? 'selected' : ''}>long</option></select></div>${fields.map(f => `<label style="display:block;margin-top:15px;font-weight:800">${f[1]}<textarea onchange="D.scripts[${i}].${f[0]}=this.value;save()">${esc(s.dev || s.hook || '')}</textarea></label>`).join('')}`;
+        }
+        function openBookComposer() {
+            document.getElementById('bookComposer').classList.remove('hidden');
+            document.getElementById('bookTitle').focus();
+        }
+
+        function closeBookComposer() {
+            document.getElementById('bookComposer').classList.add('hidden');
+            document.getElementById('bookTitle').value = '';
+            document.getElementById('bookAuthor').value = '';
+            document.getElementById('bookFile').value = '';
+            document.getElementById('bookRead').checked = true;
+        }
+
+        async function openBookReader(index) {
+            if (!Array.isArray(D.books) || !Number.isInteger(index) || index < 0 || index >= D.books.length) return alert('Ce livre n’existe plus.');
+            let book = D.books[index];
+            if (!book?.fileId && !book?.fileData) return alert('Aucun fichier disponible pour ce livre.');
+            let extension = (book.fileName || '').split('.').pop().toLowerCase();
+            if (!['pdf', 'txt', 'html', 'htm', 'png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'docx'].includes(extension)) return alert('Ce format ne peut pas être lu directement dans le navigateur.');
+            stopReadingTimer();
+            readingBookIndex = index;
+            readingElapsed = Number(book.readingSeconds) || 0;
+            document.getElementById('readerTitle').textContent = book.title || 'Lecture du livre';
+            document.getElementById('readerFileName').textContent = book.fileName || '';
+            let readerFrame = document.getElementById('readerFrame');
+            readerFrame.removeAttribute('srcdoc');
+            if (activeBookObjectUrl) URL.revokeObjectURL(activeBookObjectUrl);
+            let fileSource = book.fileData;
+            if (book.fileId) {
+                try {
+                    let blob = await getBookFile(book.fileId);
+                    if (!blob) return alert('Le fichier de ce livre est introuvable.');
+                    activeBookObjectUrl = URL.createObjectURL(blob);
+                    fileSource = activeBookObjectUrl;
+                } catch (error) {
+                    return alert('Impossible d’ouvrir le fichier de ce livre.');
+                }
+            }
+            if (extension === 'docx') {
+                if (!window.mammoth) return alert('La lecture DOCX nécessite une connexion Internet pour charger le lecteur.');
+                try {
+                    let response = await fetch(fileSource);
+                    let arrayBuffer = await response.arrayBuffer();
+                    let result = await window.mammoth.convertToHtml({ arrayBuffer });
+                    readerFrame.srcdoc = `<article style="max-width:900px;margin:0 auto;padding:24px;font:16px Poppins,sans-serif;line-height:1.7;color:#183b32">${result.value}</article>`;
+                } catch (error) {
+                    return alert('Impossible de lire ce fichier DOCX dans le navigateur.');
+                }
+            } else {
+                readerFrame.src = fileSource;
+            }
+            updateReadingTimer();
+            document.getElementById('bookReader').classList.remove('hidden');
+            startReadingTimer();
+        }
+
+        function closeBookReader() {
+            stopReadingTimer();
+            saveReadingTime();
+            document.getElementById('readerFrame').src = 'about:blank';
+            document.getElementById('readerFrame').removeAttribute('srcdoc');
+            document.getElementById('bookReader').classList.add('hidden');
+            if (activeBookObjectUrl) URL.revokeObjectURL(activeBookObjectUrl);
+            activeBookObjectUrl = '';
+            readingBookIndex = -1;
+        }
+
+        function startReadingTimer() {
+            if (readingTimer || readingBookIndex < 0) return;
+            readingStartedAt = Date.now();
+            readingTimer = setInterval(updateReadingTimer, 1000);
+            updateReadingTimerButton();
+        }
+
+        function stopReadingTimer() {
+            if (readingTimer) {
+                readingElapsed += Math.floor((Date.now() - readingStartedAt) / 1000);
+                clearInterval(readingTimer);
+                readingTimer = null;
+                saveReadingTime();
+            }
+            updateReadingTimer();
+            updateReadingTimerButton();
+        }
+
+        function toggleReadingTimer() {
+            if (readingTimer) stopReadingTimer();
+            else startReadingTimer();
+        }
+
+        function resetReadingTimer() {
+            stopReadingTimer();
+            readingElapsed = 0;
+            saveReadingTime();
+            updateReadingTimer();
+            startReadingTimer();
+        }
+
+        function saveReadingTime() {
+            if (readingBookIndex < 0 || !D.books[readingBookIndex]) return;
+            D.books[readingBookIndex].readingSeconds = readingElapsed;
+            save();
+        }
+
+        function updateReadingTimer() {
+            let seconds = readingElapsed;
+            if (readingTimer) seconds += Math.floor((Date.now() - readingStartedAt) / 1000);
+            let hours = String(Math.floor(seconds / 3600)).padStart(2, '0');
+            let minutes = String(Math.floor(seconds % 3600 / 60)).padStart(2, '0');
+            let remaining = String(seconds % 60).padStart(2, '0');
+            document.getElementById('readerTimer').textContent = `${hours}:${minutes}:${remaining}`;
+        }
+
+        function updateReadingTimerButton() {
+            let button = document.getElementById('readerTimerToggle');
+            if (button) button.textContent = readingTimer ? 'Pause' : 'Reprendre';
+        }
+
+        async function deleteBook(index) {
+            if (!Array.isArray(D.books) || !Number.isInteger(index) || index < 0 || index >= D.books.length) return;
+            let book = D.books[index];
+            if (!book || !confirm(`Supprimer « ${book.title || 'ce livre'} » ?`)) return;
+            let removed = D.books.splice(index, 1)[0];
+            if (!save()) {
+                D.books.splice(index, 0, removed);
+                return;
+            }
+            await removeBookFile(removed.fileId);
+            renderBooks();
+        }
+
+        async function addBook() {
+            let title = document.getElementById('bookTitle').value.trim();
+            let author = document.getElementById('bookAuthor').value.trim();
+            let cat = document.getElementById('bookCategory').value;
+            let file = document.getElementById('bookFile').files[0];
+            let read = document.getElementById('bookRead').checked;
+            if (!title) return alert('Écris le nom du livre.');
+            if (!file) return alert('Choisis le fichier du livre.');
+            let fileId = newFileId();
+            try {
+                await storeBookFile(fileId, file);
+                let book = { title, author, cat, read, fileName: file.name, fileType: file.type, fileSize: file.size, fileId };
+                if (!Array.isArray(D.books)) D.books = [];
+                D.books.push(book);
+                if (!save()) {
+                    D.books.pop();
+                    await removeBookFile(fileId);
+                    renderBooks();
+                    return;
+                }
+                renderBooks();
+                closeBookReader();
+                document.getElementById('books').classList.remove('hidden');
+                document.getElementById('booksList').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                closeBookComposer();
+            } catch (error) {
+                alert('Impossible d’enregistrer ce fichier. Vérifie l’espace disponible sur le disque.');
+                console.error('Erreur de stockage du livre', error);
+            }
+        }
+
+        function renderBooks() {
+            if (!Array.isArray(D.books)) D.books = [];
+            D.books = D.books.filter(book => book && typeof book === 'object');
+            let chart = document.getElementById('bookChart');
+            let list = document.getElementById('booksList');
+            if (!chart || !list) return;
+            let readBooks = D.books.filter(b => b.read !== false);
+            let categories = readBooks.reduce((total, b) => { let category = b.cat || 'Autre'; total[category] = (total[category] || 0) + 1; return total }, {});
+            let colors = ['#0a967a', '#4d7fea', '#df9b2f', '#d95c5c', '#8b63d8', '#4f9fb8'];
+            let parts = Object.entries(categories).map(([label, amount], index) => ({ label, amount, color: colors[index % colors.length] }));
+            let cursor = 0;
+            let segments = parts.map(part => { let start = cursor; cursor += part.amount / readBooks.length * 360; return `${part.color} ${start}deg ${cursor}deg` });
+            chart.innerHTML = parts.length
+                ? `<div class="book-donut" style="--book-segments:${segments.join(',')}"><div><b>${readBooks.length}</b><small>livre${readBooks.length > 1 ? 's' : ''} lu${readBooks.length > 1 ? 's' : ''}</small></div></div><div class="book-legend">${parts.map(part => `<span><i style="background:${part.color}"></i>${esc(part.label)} <b>${part.amount}</b></span>`).join('')}</div>`
+                : '<p class="sub">Marque un livre comme lu pour voir sa répartition par domaine.</p>';
+            list.innerHTML = D.books.map((b, i) => `<div class="card book-card"><span class="pill">${esc(b.cat || 'Autre')}</span><h3>${esc(b.title || 'Livre sans titre')}</h3><div class="sub">${esc(b.author || 'Auteur non renseigné')}</div><label class="book-read-status"><input type="checkbox" ${b.read !== false ? 'checked' : ''} onchange="D.books[${i}].read=this.checked;save();renderBooks()"> Lu</label>${b.fileName ? `<div class="book-file"><span>${esc(b.fileName)}</span><div class="book-actions"><button class="btn book-open" onclick="openBookReader(${i})">Lire dans l’application</button><button class="btn delete-book" onclick="deleteBook(${i})">Supprimer</button></div></div>` : ''}</div>`).join('');
+        }
+        let personalEditIndex = -1;
+        function ensurePersonalData() {
+            if (!D.personal || typeof D.personal !== 'object' || Array.isArray(D.personal)) D.personal = {};
+            if (!Array.isArray(D.personal.history)) D.personal.history = [];
+            return D.personal;
+        }
+        function loadPersonal() {
+            ensurePersonalData();
+            let currentMonth = new Date().toLocaleDateString('fr-FR', { month: 'long' });
+            let monthSelect = document.getElementById('personalMonth');
+            if (monthSelect && [...monthSelect.options].some(option => option.value === currentMonth)) monthSelect.value = currentMonth;
+            personalEditIndex = -1;
+            let submit = document.getElementById('personalSubmit');
+            if (submit) submit.textContent = 'Ajouter ces données';
+            loadPersonalMonth();
+            renderPersonalHistory();
+            renderPersonalChart();
+        }
+        function loadPersonalMonth() {
+            let personal = ensurePersonalData();
+            let monthSelect = document.getElementById('personalMonth');
+            let weight = document.getElementById('weight');
+            let height = document.getElementById('height');
+            let submit = document.getElementById('personalSubmit');
+            if (!monthSelect || !weight || !height || !submit) return;
+            let month = monthSelect.value;
+            let record = personal.history.find(item => item && item.month === month);
+            weight.value = record?.weight || '';
+            height.value = record?.height || '';
+            personalEditIndex = record ? personal.history.indexOf(record) : -1;
+            submit.textContent = record ? 'Enregistrer les modifications' : 'Ajouter ces données';
+        }
+        function savePersonal() {
+            let personal = ensurePersonalData();
+            personal.weight = document.getElementById('weight')?.value || '';
+            personal.height = document.getElementById('height')?.value || '';
+            save();
+        }
+        function addPersonalRecord() {
+            let personal = ensurePersonalData();
+            let weight = document.getElementById('weight')?.value || '';
+            let height = document.getElementById('height')?.value || '';
+            let month = document.getElementById('personalMonth')?.value || '';
+            if (!weight && !height) return alert('Ajoute au moins un poids ou une taille.');
+            let record = { month, weight: String(weight), height: String(height), date: dayKey() };
+            let monthIndex = personal.history.findIndex(item => item && item.month === month);
+            if (personalEditIndex >= 0 && personal.history[personalEditIndex]) personal.history[personalEditIndex] = { ...personal.history[personalEditIndex], ...record };
+            else if (monthIndex >= 0) personal.history[monthIndex] = { ...personal.history[monthIndex], ...record };
+            else personal.history.unshift(record);
+            personal.weight = record.weight;
+            personal.height = record.height;
+            personalEditIndex = -1;
+            let submit = document.getElementById('personalSubmit');
+            if (submit) submit.textContent = 'Ajouter ces données';
+            if (!save()) return;
+            renderPersonalHistory();
+            renderPersonalChart();
+            loadPersonalMonth();
+        }
+
+        function renderPersonalHistory() {
+            let history = ensurePersonalData().history.map((record, index) => ({ record, index })).filter(item => item.record && typeof item.record === 'object');
+            let container = document.getElementById('personalHistory');
+            if (!container) return;
+            container.innerHTML = history.length ? history.map(({ record, index }) => `<div class="personal-record"><div><b>${esc(record.month || 'Mois non renseigné')}</b><div class="sub">Ajouté le ${esc(record.date || '')}</div></div><span>${record.weight ? `${esc(record.weight)} kg` : ''}${record.weight && record.height ? ' · ' : ''}${record.height ? `${esc(record.height)} cm` : ''}</span><div class="personal-actions"><button class="btn personal-edit" onclick="editPersonalRecord(${index})">Modifier</button><button class="btn delete-personal" onclick="deletePersonalRecord(${index})">Supprimer</button></div></div>`).join('') : '<p class="sub">Aucune donnée enregistrée.</p>';
+        }
+
+        function editPersonalRecord(index) {
+            let history = ensurePersonalData().history;
+            if (!Number.isInteger(index) || index < 0 || index >= history.length) return;
+            let record = history[index];
+            if (!record) return;
+            personalEditIndex = index;
+            document.getElementById('weight').value = record.weight || '';
+            document.getElementById('height').value = record.height || '';
+            document.getElementById('personalMonth').value = record.month || '';
+            document.getElementById('personalSubmit').textContent = 'Enregistrer les modifications';
+            document.getElementById('weight').focus();
+        }
+
+        function deletePersonalRecord(index) {
+            let history = ensurePersonalData().history;
+            if (!Number.isInteger(index) || index < 0 || index >= history.length) return;
+            if (!confirm('Supprimer cette donnée personnelle ?')) return;
+            let removed = history.splice(index, 1)[0];
+            if (personalEditIndex === index) { personalEditIndex = -1; document.getElementById('personalSubmit').textContent = 'Ajouter ces données'; }
+            if (!save()) history.splice(index, 0, removed);
+            renderPersonalHistory();
+            renderPersonalChart();
+        }
+
+        function renderPersonalChart() {
+            let history = ensurePersonalData().history;
+            let monthOrder = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+            let records = history.filter(record => record && Number.isFinite(Number(record.weight)) && Number(record.weight) > 0).reduce((months, record) => {
+                months.set(record.month || 'Mois non renseigné', Number(record.weight));
+                return months;
+            }, new Map());
+            let values = [...records.entries()].sort(([monthA], [monthB]) => monthOrder.indexOf(monthA) - monthOrder.indexOf(monthB));
+            let chart = document.getElementById('personalChart');
+            if (!chart) return;
+            if (!values.length) {
+                chart.innerHTML = '<p class="sub">Ajoute un poids pour afficher le diagramme.</p>';
+                return;
+            }
+            let total = values.reduce((sum, [, weight]) => sum + weight, 0);
+            let cursor = 0;
+            let previousWeight = null;
+            let trends = values.map(([month, weight]) => {
+                let trend = previousWeight === null ? 'stable' : weight > previousWeight ? 'increase' : weight < previousWeight ? 'decrease' : 'stable';
+                previousWeight = weight;
+                return { month, weight, trend };
+            });
+            let colors = { decrease: '#d94b4b', stable: '#e4b83f', increase: '#078a5c' };
+            let segments = trends.map(({ weight, trend }) => {
+                let start = cursor;
+                cursor += weight / total * 360;
+                return `${colors[trend]} ${start}deg ${cursor}deg`;
+            }).join(', ');
+            chart.innerHTML = `<div class="personal-donut" style="--donut-segments:${segments}"><div><b>${total.toFixed(1)}</b><small>kg cumulés</small></div></div><div class="personal-legend"><div class="personal-legend-key"><span><i class="trend-decrease"></i>Baisse</span><span><i class="trend-stable"></i>Stable</span><span><i class="trend-increase"></i>Hausse</span></div>${trends.map(({ month, weight, trend }) => `<span><i class="trend-${trend}"></i>${esc(month)} · ${weight} kg</span>`).join('')}</div>`;
+        }
+        let financeEditIndex = -1;
+
+        function openFinanceComposer() {
+            financeEditIndex = -1;
+            document.getElementById('financeComposer').classList.remove('hidden');
+            document.getElementById('financeType').value = 'épargne';
+            document.getElementById('financeAmount').value = '';
+            document.getElementById('financeProject').value = '';
+            document.getElementById('financeDate').value = dayKey();
+            document.getElementById('financeSubmit').textContent = 'Enregistrer';
+            document.getElementById('financeAmount').focus();
+        }
+
+        function openFinanceEditor(index) {
+            if (!Array.isArray(D.finance) || !Number.isInteger(index) || index < 0 || index >= D.finance.length) return;
+            let entry = D.finance[index];
+            if (!entry) return;
+            financeEditIndex = index;
+            document.getElementById('financeComposer').classList.remove('hidden');
+            document.getElementById('financeType').value = entry.type;
+            document.getElementById('financeAmount').value = entry.amount;
+            document.getElementById('financeProject').value = entry.project || '';
+            document.getElementById('financeDate').value = entry.date || dayKey();
+            document.getElementById('financeSubmit').textContent = 'Modifier';
+            document.getElementById('financeAmount').focus();
+        }
+
+        function closeFinanceComposer() {
+            financeEditIndex = -1;
+            document.getElementById('financeComposer').classList.add('hidden');
+            document.getElementById('financeAmount').value = '';
+            document.getElementById('financeProject').value = '';
+            document.getElementById('financeSubmit').textContent = 'Enregistrer';
+        }
+
+        function addFinance() {
+            if (!Array.isArray(D.finance)) D.finance = [];
+            let type = document.getElementById('financeType').value;
+            let amount = Number(document.getElementById('financeAmount').value);
+            let project = document.getElementById('financeProject').value.trim();
+            let date = document.getElementById('financeDate').value || dayKey();
+            if (!amount || amount <= 0) return alert('Saisis un montant supérieur à zéro.');
+            let entry = { type, amount, project, date };
+            if (financeEditIndex >= 0 && financeEditIndex < D.finance.length) D.finance[financeEditIndex] = entry;
+            else D.finance.push(entry);
+            if (!save()) return;
+            renderFinance();
+            closeFinanceComposer();
+        }
+        function renderFinance() {
+            if (!Array.isArray(D.finance)) D.finance = [];
+            D.finance = D.finance.filter(entry => entry && typeof entry === 'object');
+            let entries = D.finance.map((entry, sourceIndex) => ({ ...entry, amount: Number(entry.amount), sourceIndex })).filter(entry => Number.isFinite(entry.amount) && entry.amount > 0);
+            let savingTotalElement = document.getElementById('savingTotal');
+            let investTotalElement = document.getElementById('investTotal');
+            let netTotalElement = document.getElementById('netTotal');
+            let list = document.getElementById('financeList');
+            let chart = document.getElementById('financeChart');
+            if (!savingTotalElement || !investTotalElement || !netTotalElement || !list || !chart) return;
+            let saving = entries.filter(x => x.type === 'épargne').reduce((total, x) => total + x.amount, 0);
+            let investment = entries.filter(x => x.type === 'investissement').reduce((total, x) => total + x.amount, 0);
+            savingTotalElement.textContent = saving.toLocaleString();
+            investTotalElement.textContent = investment.toLocaleString();
+            netTotalElement.textContent = (saving + investment).toLocaleString();
+            list.innerHTML = entries.map(x => `<div class="task finance-entry" data-finance-index="${x.sourceIndex}"><span class="pill">${esc(x.type || 'Autre')}</span><div><b>${x.amount.toLocaleString()}</b> · ${esc(x.project || 'Sans objectif')}<div class="sub">${esc(x.date || '')}</div></div><button class="btn finance-edit" onclick="openFinanceEditor(${x.sourceIndex})">Modifier</button></div>`).join('');
+            let values = entries.slice(-10);
+            let maxAmount = Math.max(...values.map(x => x.amount), 0);
+            let total = values.reduce((sum, x) => sum + x.amount, 0);
+            let cursor = 0;
+            let segments = values.map(x => { let ratio = maxAmount ? x.amount / maxAmount : 0; let level = ratio <= 0.33 ? 'low' : ratio <= 0.66 ? 'medium' : 'high'; let color = { low: '#d94b4b', medium: '#e4b83f', high: '#078a5c' }[level]; let start = cursor; cursor += total ? x.amount / total * 360 : 0; return { label: x.project || 'Sans objectif', amount: x.amount, color, segment: `${color} ${start}deg ${cursor}deg` }; });
+            chart.innerHTML = values.length ? `<div class="finance-donut" style="--finance-segments:${segments.map(x => x.segment).join(', ')}"><div><b>${total.toLocaleString()}</b><small>Total</small></div></div><div class="finance-legend"><div class="finance-legend-key"><span><i class="trend-decrease"></i>Bas</span><span><i class="trend-stable"></i>Moyen</span><span><i class="trend-increase"></i>Élevé</span></div>${segments.map(x => `<span><i style="background:${x.color}"></i>${esc(x.label)} · ${x.amount.toLocaleString()}</span>`).join('')}</div>` : '<p class="sub">Ajoute une opération pour afficher le diagramme.</p>';
+        }
+        function deleteFinance(index) {
+            if (!Array.isArray(D.finance) || !Number.isInteger(index) || index < 0 || index >= D.finance.length) return;
+            let entry = D.finance[index];
+            if (!entry || !confirm(`Supprimer l’opération « ${entry.project || entry.amount} » ?`)) return;
+            let removed = D.finance.splice(index, 1)[0];
+            if (!save()) D.finance.splice(index, 0, removed);
+            renderFinance();
+        }
+        const renderFinanceBase = renderFinance;
+        renderFinance = function () {
+            renderFinanceBase();
+            document.querySelectorAll('#financeList .finance-entry').forEach((entry, index) => {
+                let actions = document.createElement('div');
+                actions.className = 'finance-actions';
+                let edit = entry.querySelector('.finance-edit');
+                if (edit) actions.append(edit);
+                let remove = document.createElement('button');
+                remove.className = 'btn finance-delete';
+                remove.textContent = 'Supprimer';
+                remove.onclick = () => deleteFinance(Number(entry.dataset.financeIndex));
+                actions.append(remove);
+                entry.append(actions);
+            });
+        }
+        function openNeedComposer() {
+            needEditIndex = -1;
+            document.getElementById('needComposer').classList.remove('hidden');
+            document.getElementById('needLevel').value = 'cheap';
+            document.getElementById('needName').value = '';
+            document.getElementById('needSubmit').textContent = 'Ajouter';
+            document.getElementById('needName').focus();
+        }
+
+        function closeNeedComposer() {
+            document.getElementById('needComposer').classList.add('hidden');
+            document.getElementById('needName').value = '';
+            needEditIndex = -1;
+        }
+
+        function openNeedEditor(index) {
+            let need = D.needs[index];
+            if (!need) return;
+            needEditIndex = index;
+            document.getElementById('needComposer').classList.remove('hidden');
+            document.getElementById('needLevel').value = need.level;
+            document.getElementById('needName').value = need.name;
+            document.getElementById('needSubmit').textContent = 'Enregistrer';
+            document.getElementById('needName').focus();
+        }
+
+        function deleteNeed(index) {
+            let need = D.needs[index];
+            if (!need || !confirm(`Supprimer « ${need.name} » ?`)) return;
+            D.needs.splice(index, 1);
+            save();
+            renderNeeds();
+        }
+
+        function addNeed() {
+            let level = document.getElementById('needLevel').value;
+            let name = document.getElementById('needName').value.trim();
+            if (!name) return alert('Écris le nom du besoin.');
+            if (needEditIndex >= 0) D.needs[needEditIndex] = { ...D.needs[needEditIndex], name, level };
+            else D.needs.push({ name, level, done: false });
+            save();
+            renderNeeds();
+            closeNeedComposer();
+        }
+        function renderNeeds() { ['cheap', 'medium', 'expensive'].forEach(k => document.getElementById(k).innerHTML = D.needs.filter(n => n.level === k).map(n => { let idx = D.needs.indexOf(n); return `<div class="task ${n.done ? 'done' : ''}"><input type="checkbox" ${n.done ? 'checked' : ''} onchange="D.needs[${idx}].done=this.checked;save();renderNeeds()"><div class="tasktext">${esc(n.name)}</div><div class="need-actions"><button class="btn need-edit" onclick="openNeedEditor(${idx})">Modifier</button><button class="btn need-delete" onclick="deleteNeed(${idx})">Supprimer</button></div></div>` }).join('')) }
+
+        function selectFocusDuration(value) {
+            if (focusSession) return;
+            focusSelectedMinutes = value === 'custom' ? 'custom' : Number(value);
+            document.querySelectorAll('.focus-preset').forEach(button => button.classList.toggle('selected', button.dataset.minutes === String(value)));
+            document.getElementById('customFocusField').classList.toggle('hidden', value !== 'custom');
+            if (value !== 'custom') updateFocusDisplay(Number(value) * 60);
+        }
+
+        function focusDurationInSeconds() {
+            let minutes = focusSelectedMinutes === 'custom' ? Number(document.getElementById('customFocusMinutes').value) : focusSelectedMinutes;
+            if (!Number.isInteger(minutes) || minutes < 1 || minutes > 1440) return 0;
+            return minutes * 60;
+        }
+
+        function updateFocusDisplay(seconds) {
+            seconds = Math.max(0, Math.floor(seconds));
+            let hours = String(Math.floor(seconds / 3600)).padStart(2, '0');
+            let minutes = String(Math.floor(seconds % 3600 / 60)).padStart(2, '0');
+            let remaining = String(seconds % 60).padStart(2, '0');
+            document.getElementById('focusTimer').textContent = `${hours}:${minutes}:${remaining}`;
+            let progress = focusSession ? (seconds / focusSession.durationSeconds) * 100 : 100;
+            document.querySelector('.focus-ring')?.style.setProperty('--focus-progress', `${progress}%`);
+        }
+
+        function focusElapsedSeconds() {
+            if (!focusSession) return 0;
+            let elapsed = focusSession.elapsedSeconds;
+            if (focusSession.running) elapsed += Math.floor((Date.now() - focusSession.segmentStartedAt) / 1000);
+            return Math.min(focusSession.durationSeconds, elapsed);
+        }
+
+        function updateFocusTimer() {
+            if (!focusSession) return;
+            let elapsed = focusElapsedSeconds();
+            updateFocusDisplay(focusSession.durationSeconds - elapsed);
+            if (elapsed >= focusSession.durationSeconds) finishFocus();
+        }
+
+        function startFocus() {
+            if (focusSession) return;
+            let durationSeconds = focusDurationInSeconds();
+            if (!durationSeconds) return alert('Choisis une durée comprise entre 1 et 1440 minutes.');
+            try {
+                focusAudioContext = focusAudioContext || new (window.AudioContext || window.webkitAudioContext)();
+                focusAudioContext.resume();
+            } catch (error) {
+                console.warn('Initialisation de la sonnerie impossible', error);
+            }
+            focusQueue = document.getElementById('focusSequence').value.split(',').map(value => Number(value.trim())).filter(value => Number.isInteger(value) && value >= 1 && value <= 1440).map(value => value * 60);
+            focusQueue.unshift(durationSeconds);
+            startNextFocus();
+        }
+
+        function startNextFocus() {
+            let durationSeconds = focusQueue.shift();
+            if (!durationSeconds) return;
+            let startedAt = new Date();
+            focusSession = { durationSeconds, startedAt: startedAt.toISOString(), segmentStartedAt: Date.now(), elapsedSeconds: 0, running: true };
+            document.getElementById('focusStatus').textContent = 'Travail en cours';
+            document.getElementById('focusMessage').textContent = '';
+            document.getElementById('focusStart').disabled = true;
+            document.getElementById('focusPause').disabled = false;
+            document.getElementById('focusStop').disabled = false;
+            document.getElementById('customFocusMinutes').disabled = true;
+            document.getElementById('focusSequence').disabled = true;
+            updateFocusControls();
+            updateFocusTimer();
+            focusTimerId = setInterval(updateFocusTimer, 250);
+        }
+
+        function updateFocusControls() {
+            let pause = document.getElementById('focusPause');
+            if (pause) pause.textContent = focusSession?.running ? 'Pause' : 'Reprendre';
+        }
+
+        function toggleFocusPause() {
+            if (!focusSession) return;
+            if (focusSession.running) {
+                focusSession.elapsedSeconds = focusElapsedSeconds();
+                focusSession.running = false;
+                clearInterval(focusTimerId);
+                focusTimerId = null;
+                document.getElementById('focusStatus').textContent = 'En pause';
+            } else {
+                focusSession.segmentStartedAt = Date.now();
+                focusSession.running = true;
+                focusTimerId = setInterval(updateFocusTimer, 250);
+                document.getElementById('focusStatus').textContent = 'Travail en cours';
+            }
+            updateFocusControls();
+            updateFocusTimer();
+        }
+
+        function stopFocus() {
+            if (!focusSession || !confirm('Arrêter cette session de Focus ?')) return;
+            focusSession.elapsedSeconds = focusElapsedSeconds();
+            focusQueue = [];
+            saveFocusSession('interrompue');
+        }
+
+        function finishFocus() {
+            if (!focusSession) return;
+            focusSession.elapsedSeconds = focusSession.durationSeconds;
+            playFocusAlert();
+            saveFocusSession('terminée');
+            document.getElementById('focusMessage').textContent = 'Temps terminé !';
+            if (focusQueue.length) {
+                document.getElementById('focusMessage').textContent = 'Temps terminé ! Prochaine session...';
+                setTimeout(startNextFocus, 900);
+            }
+        }
+
+        function playFocusAlert() {
+            try {
+                let audio = focusAudioContext || new (window.AudioContext || window.webkitAudioContext)();
+                focusAudioContext = audio;
+                stopFocusAlert();
+                document.getElementById('focusAlarmStop').classList.remove('hidden');
+                clearTimeout(focusAlertTimer);
+                let startAt = audio.currentTime + 0.02;
+                for (let repeat = 0; repeat < 30; repeat++) {
+                    [660, 880, 660].forEach((frequency, index) => {
+                        let oscillator = audio.createOscillator();
+                        let gain = audio.createGain();
+                        let toneStart = startAt + repeat * 2 + index * 0.16;
+                        oscillator.frequency.value = frequency;
+                        gain.gain.setValueAtTime(0.12, toneStart);
+                        gain.gain.exponentialRampToValueAtTime(0.001, toneStart + 0.14);
+                        oscillator.connect(gain);
+                        gain.connect(audio.destination);
+                        oscillator.start(toneStart);
+                        oscillator.stop(toneStart + 0.15);
+                        focusAlertNodes.push(oscillator);
+                    });
+                }
+                focusAlertTimer = setTimeout(stopFocusAlert, 60000);
+            } catch (error) {
+                console.warn('Alerte sonore indisponible', error);
+            }
+        }
+
+        function stopFocusAlert() {
+            focusAlertNodes.forEach(oscillator => {
+                try { oscillator.stop(); } catch (error) { }
+            });
+            focusAlertNodes = [];
+            clearTimeout(focusAlertTimer);
+            focusAlertTimer = null;
+            document.getElementById('focusAlarmStop')?.classList.add('hidden');
+        }
+
+        function saveFocusSession(status) {
+            if (!focusSession) return;
+            clearInterval(focusTimerId);
+            focusTimerId = null;
+            let endedAt = new Date();
+            D.focusSessions.unshift({
+                plannedSeconds: focusSession.durationSeconds,
+                actualSeconds: focusSession.elapsedSeconds,
+                date: endedAt.toISOString().slice(0, 10),
+                startedAt: focusSession.startedAt,
+                endedAt: endedAt.toISOString(),
+                status
+            });
+            D.focusSessions = D.focusSessions.slice(0, 50);
+            save();
+            focusSession = null;
+            document.getElementById('focusStatus').textContent = status === 'terminée' ? 'Session terminée' : 'Session interrompue';
+            document.getElementById('focusStart').disabled = false;
+            document.getElementById('focusPause').disabled = true;
+            document.getElementById('focusStop').disabled = true;
+            document.getElementById('customFocusMinutes').disabled = false;
+            document.getElementById('focusSequence').disabled = false;
+            updateFocusControls();
+        }
+
+        function analysisRange(period) {
+            let end = new Date();
+            end.setHours(23, 59, 59, 999);
+            let start = new Date(end);
+            if (period === 'day') start.setHours(0, 0, 0, 0);
+            if (period === 'week') { let day = start.getDay(); start.setDate(start.getDate() - (day === 0 ? 6 : day - 1)); start.setHours(0, 0, 0, 0); }
+            if (period === 'month') { start.setDate(1); start.setHours(0, 0, 0, 0); }
+            return { start, end };
+        }
+
+        function dateInRange(value, range) {
+            if (!value) return false;
+            let date = new Date(value);
+            return !Number.isNaN(date.getTime()) && date >= range.start && date <= range.end;
+        }
+
+        function analysisDays(period) {
+            let range = analysisRange(period), days = [], cursor = new Date(range.start);
+            while (cursor <= range.end) { days.push(new Date(cursor)); cursor.setDate(cursor.getDate() + 1); }
+            return days;
+        }
+
+        function analysisTaskCount(date) {
+            let day = D.days[dayKey(date)];
+            if (!day) return null;
+            let total = [...(day.main || []), ...(day.secondary || [])].filter(Boolean).length;
+            return total ? day.done.filter(Boolean).length : null;
+        }
+
+        function analysisTaskTotal(date) {
+            let day = D.days[dayKey(date)];
+            if (!day) return null;
+            let total = [...(day.main || []), ...(day.secondary || [])].filter(Boolean).length;
+            return total || null;
+        }
+
+        function analysisScriptCount(date) {
+            return D.scripts.filter(script => script.createdAt && dayKey(new Date(script.createdAt)) === dayKey(date)).length;
+        }
+
+        function analysisFinanceTotal(date) {
+            return D.finance.filter(entry => entry.date === dayKey(date)).reduce((total, entry) => total + (Number(entry.amount) || 0), 0);
+        }
+
+        function analysisFocusMinutes(date) {
+            return D.focusSessions.filter(session => session.status === 'terminée' && session.endedAt && dayKey(new Date(session.endedAt)) === dayKey(date)).reduce((total, session) => total + (Number(session.actualSeconds) || 0) / 60, 0);
+        }
+
+        function analysisLine(title, values, color, unit = '') {
+            let valid = values.map((value, index) => ({ value, index })).filter(item => item.value !== null && Number.isFinite(item.value));
+            if (!valid.length) return `<div class="analysis-chart"><div class="analysis-chart-title"><strong>${title}</strong><span>Donnée insuffisante</span></div><p class="sub">Aucune donnée datée enregistrée pour cette période.</p></div>`;
+            let max = Math.max(...valid.map(item => item.value), 1), width = 520, height = 150, points = valid.map(item => `${20 + item.index * (width - 40) / Math.max(values.length - 1, 1)},${height - 25 - item.value / max * (height - 50)}`).join(' ');
+            return `<div class="analysis-chart"><div class="analysis-chart-title"><strong>${title}</strong><span>${valid[valid.length - 1].value.toFixed(valid[valid.length - 1].value % 1 ? 1 : 0)}${unit}</span></div><svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${esc(title)}"><path d="M 20 ${height - 25} H ${width - 20}" class="analysis-axis"></path><polyline points="${points}" style="stroke:${color}"></polyline>${valid.map(item => `<circle cx="${20 + item.index * (width - 40) / Math.max(values.length - 1, 1)}" cy="${height - 25 - item.value / max * (height - 50)}" r="3.5" style="fill:${color}"></circle>`).join('')}</svg><small>${unit ? 'Valeurs réelles enregistrées' : 'Activité datée enregistrée'}</small></div>`;
+        }
+
+        function analysisMetric(label, value, detail) {
+            return `<div class="analysis-stat"><span>${label}</span><strong>${value}</strong><small>${detail}</small></div>`;
+        }
+
+        function analysisPercent(current, previous) {
+            if (!Number.isFinite(current) || !Number.isFinite(previous) || previous === 0) return 'Donnée insuffisante';
+            let percent = Math.round((current - previous) / previous * 100);
+            return `${percent >= 0 ? '+' : ''}${percent}%`;
+        }
+
+        function renderAnalysis() {
+            let stats = document.getElementById('analysisStats');
+            if (!stats) return;
+            let period = document.getElementById('analysisPeriod').value, range = analysisRange(period), days = analysisDays(period);
+            let tasks = days.map(analysisTaskCount).filter(value => value !== null), tasksDone = tasks.reduce((sum, value) => sum + value, 0);
+            let projects = D.projects.filter(project => project.month === monthKey(range.start)), projectsDone = projects.filter(project => project.done).length;
+            let scripts = D.scripts.filter(script => dateInRange(script.createdAt, range)).length;
+            let readBooks = D.books.filter(book => book.read !== false).length;
+            let readingMinutes = D.books.reduce((total, book) => total + (Number(book.readingSeconds) || 0), 0) / 60;
+            let finance = D.finance.filter(entry => dateInRange(entry.date, range));
+            let savings = finance.filter(entry => entry.type === 'épargne').reduce((sum, entry) => sum + (Number(entry.amount) || 0), 0);
+            let investments = finance.filter(entry => entry.type === 'investissement').reduce((sum, entry) => sum + (Number(entry.amount) || 0), 0);
+            let activeDays = Object.keys(D.days).filter(key => D.days[key]?.done?.some(Boolean)).sort().reverse();
+            let streak = 0, cursor = new Date();
+            while (D.days[dayKey(cursor)] && D.days[dayKey(cursor)].done.some(Boolean)) { streak++; cursor.setDate(cursor.getDate() - 1); }
+            let taskTotal = days.map(analysisTaskTotal).filter(value => value !== null).reduce((sum, value) => sum + value, 0);
+            let progress = taskTotal ? `${Math.round(tasksDone / taskTotal * 100)}%` : 'Donnée insuffisante';
+            stats.innerHTML = [analysisMetric('Progression générale', progress, `${tasksDone} objectif${tasksDone > 1 ? 's' : ''} réalisé${tasksDone > 1 ? 's' : ''}`), analysisMetric('Objectifs réalisés', tasks.length ? `${tasksDone}` : 'Donnée insuffisante', 'Objectifs journaliers cochés'), analysisMetric('Temps de lecture', readingMinutes ? `${Math.round(readingMinutes)} min` : 'Donnée insuffisante', 'Cumul réellement enregistré'), analysisMetric('Livres lus', readBooks || 'Donnée insuffisante', 'Bibliothèque marquée comme lue'), analysisMetric('Scripts écrits', scripts || 'Donnée insuffisante', 'Scripts avec date enregistrée'), analysisMetric('Livres écrits', 'Donnée insuffisante', 'Ce champ n’existe pas encore'), analysisMetric('Épargne', savings ? savings.toLocaleString() : 'Donnée insuffisante', 'Sur la période choisie'), analysisMetric('Investissements', investments ? investments.toLocaleString() : 'Donnée insuffisante', 'Sur la période choisie'), analysisMetric('Jours actifs consécutifs', streak || 'Donnée insuffisante', `${activeDays.length} jour${activeDays.length > 1 ? 's' : ''} avec données`)].join('');
+            let previousRange = analysisRange(period), span = range.end - range.start; previousRange.end = new Date(range.start.getTime() - 1); previousRange.start = new Date(previousRange.end.getTime() - span);
+            let previousTasks = analysisDays(period).map(date => { let previous = new Date(date); previous.setTime(previous.getTime() - span - 1); return analysisTaskCount(previous); }).filter(value => value !== null).reduce((sum, value) => sum + value, 0);
+            document.getElementById('analysisComparison').textContent = `Objectifs vs période précédente : ${analysisPercent(tasksDone, previousTasks)}`;
+            let good = tasksDone ? `${tasksDone} objectif${tasksDone > 1 ? 's' : ''} réalisé${tasksDone > 1 ? 's' : ''} sur la période.` : 'Donnée insuffisante pour identifier une réussite.';
+            let weak = taskTotal && tasksDone < taskTotal ? `${taskTotal - tasksDone} objectif${taskTotal - tasksDone > 1 ? 's' : ''} non coché${taskTotal - tasksDone > 1 ? 's' : ''}.` : 'Donnée insuffisante pour identifier un manque.';
+            let readingNote = readingMinutes ? `${Math.round(readingMinutes)} minutes de lecture cumulées sont enregistrées.` : 'Aucun temps de lecture enregistré.';
+            let regression = previousTasks > tasksDone ? 'Les objectifs réalisés sont en baisse par rapport à la période précédente.' : 'Donnée insuffisante pour confirmer une régression.';
+            document.getElementById('analysisCoach').innerHTML = `<div><b>Ce que tu as bien fait</b><p>${good}</p></div><div><b>Ce que tu n’as pas suffisamment fait</b><p>${weak}</p></div><div><b>Ce qui progresse</b><p>${scripts ? `${scripts} script${scripts > 1 ? 's' : ''} daté${scripts > 1 ? 's' : ''} ajouté${scripts > 1 ? 's' : ''}.` : 'Donnée insuffisante.'}</p></div><div><b>Ce qui régresse</b><p>${regression}</p></div><div><b>Ce que tu dois améliorer</b><p>${readingNote}</p></div><div><b>Mes priorités pour aujourd’hui</b><p>${tasksDone < 5 ? 'Compléter les objectifs encore ouverts.' : 'Maintenir les objectifs réalisés.'}</p></div>`;
+            let priorities = [taskTotal && tasksDone < taskTotal ? 'Compléter les objectifs du jour encore ouverts.' : '', !readingMinutes ? 'Enregistrer une session de lecture réelle.' : '', !scripts ? 'Écrire un script et conserver sa date.' : '', !savings && !investments ? 'Enregistrer une opération financière réelle.' : ''].filter(Boolean).slice(0, 5);
+            document.getElementById('analysisPriorities').innerHTML = priorities.length ? priorities.map((priority, index) => `<div><span>${index + 1}</span>${priority}</div>`).join('') : '<p class="sub">Donnée insuffisante pour proposer une action.</p>';
+            document.getElementById('analysisCharts').innerHTML = [analysisLine('Objectifs réalisés', days.map(analysisTaskCount), '#0a967a', ' objectifs'), analysisLine('Scripts écrits', days.map(analysisScriptCount), '#4d7fea', ' scripts'), analysisLine('Finances enregistrées', days.map(analysisFinanceTotal), '#df9b2f', ''), analysisLine('Sessions Focus terminées', days.map(analysisFocusMinutes), '#d95c5c', ' min'), analysisLine('Temps de lecture', [], '#8b63d8', ' min'), analysisLine('Livres lus', [], '#4f9fb8', ' livres')].join('');
+        }
+
+        function formatFocusDuration(seconds) {
+            let minutes = Math.floor(seconds / 60), remaining = seconds % 60;
+            return `${minutes} min${remaining ? ` ${remaining} s` : ''}`;
+        }
+
+        function renderAll() { renderToday(); renderCalendar(); renderScore(); renderProjects(); renderScripts(); renderBooks(); renderFinance(); renderNeeds(); selectFocusDuration('custom'); renderAnalysis() }
+        function show(id, b) {
+            document.querySelectorAll('.page').forEach(x => x.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+            document.querySelectorAll('.nav button').forEach(x => x.classList.remove('active'));
+            if (b) b.classList.add('active');
+        }
+        function openScriptsSection(button) { show('scripts', button); newScript(); }
+        function openBooksSection(button) { show('books', button); openBookComposer(); }
+        function openPersonalSection(button) { show('personal', button); loadPersonalMonth(); document.getElementById('weight').focus(); }
+        document.querySelectorAll('.nav button[data-section]').forEach(button => button.addEventListener('click', () => {
+            let section = button.dataset.section;
+            if (section === 'scripts') openScriptsSection(button);
+            if (section === 'books') openBooksSection(button);
+            if (section === 'personal') openPersonalSection(button);
+        }));
+        function esc(s) { return String(s ?? '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m])) }
+        document.getElementById('pin').addEventListener('keydown', e => { if (e.key === 'Enter') unlock() });
+        document.addEventListener('visibilitychange', () => { if (document.hidden) save() });
+        window.addEventListener('beforeunload', save);
+        if (sessionStorage.ok === '1') init();
+    </script>
+</body>
+
+</html>
